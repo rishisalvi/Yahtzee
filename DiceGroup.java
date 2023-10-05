@@ -1,12 +1,13 @@
 /**
  *  Create a roll of 5 dice and display them.
  *
- *  @author Mr Greenstein and 
- *  @since	
+ *  @author Mr Greenstein and Rishi Salvi
+ *  @since	10/03/23
 */
 
 public class DiceGroup {
 	private Dice [] die;
+	private int[] rolls; 
 	
 	// Create the seven different line images of a die
 	String [] line = {	" _______ ",
@@ -22,6 +23,8 @@ public class DiceGroup {
 	 */
 	public DiceGroup() {
 		// you complete
+		die = new Dice[5];
+		rolls = new int[5]; 
 	}
 		
 	/**
@@ -29,6 +32,8 @@ public class DiceGroup {
 	 */
 	public void rollDice() {
 		// you complete
+		for (int i = 0; i < 4; i++){
+			rolls[i] = die[i].roll(); 
 	}
 	
 	/**
@@ -38,6 +43,10 @@ public class DiceGroup {
 	 */
 	public void rollDice(String rawHold) {
 		// you complete
+		for (int j = 0; j < rawHold.length(); j++){
+			int diceNum = Integer.parseInt(rawHold.charAt(j)); 
+			rolls[diceNum] = die[i].roll(); 
+		}
 	}
 	
 	/**
