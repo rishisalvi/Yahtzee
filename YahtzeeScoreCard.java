@@ -1,16 +1,20 @@
 /**
- *	Describe the scorecard here.
+ *	The scorecard consists of a 3 by 13 grid. The rows are the labels and the names
+ * 	of both of the players. Each of the columns indicates the score of each player
+ * 	for each type of roll. A blank space means they haven't received a score for that
+ * 	category and it is still open to be scored. If there is a number, that is their
+ * 	score for the category
  *
  *	@author	Rishi Salvi
  *	@since	10/03/23
  */
 public class YahtzeeScoreCard {
-	private int[] scores; 
+	private int[] scores; // array containing all of the scores for each category for one player
 	
 	public YahtzeeScoreCard(){
 		scores = new int[13]; 
 		for (int i = 0; i < 13; i++)
-			scores[i] = -1; 
+			scores[i] = -1; // setting them so they appear blank
 	}
 	/**
 	 *	Get a category score on the score card.
@@ -18,7 +22,7 @@ public class YahtzeeScoreCard {
 	 *	@return				the score of that category
 	 */
 	public int getScore(int i) {
-		return scores[i];
+		return scores[i - 1];
 	}
 	
 	/**
@@ -94,65 +98,79 @@ public class YahtzeeScoreCard {
 	}
 	
 	/**
-	 *	Updates the scorecard for Three Of A Kind choice.
+	 *	Updates the scorecard for the Three Of A Kind choice.
 	 *
 	 *	@param dg	The DiceGroup to score
 	 */	
 	public void threeOfAKind(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
+		int[] scoreCount = new int[6]; 
 		for (int i = 0; i < 5; i++)
 			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
-		int zeroCount = 0; 
-		for (int a = 0; a < 5; a++){
-			if (scoreCount[a] == 0)
-				zeroCount++;
+		boolean valid = false;
+		for (int a = 0; a < 6; a++){
+			if (scoreCount[a] >= 3)
+				valid = true;
 		}
-		if (zeroCount > 2)
+		if (valid)
 			scores[6] = dg.getTotal();
 		else
 			scores[6] = 0; 
 	}
 	
+	/**
+	 *	Updates the scorecard for the Four Of A Kind choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
 	public void fourOfAKind(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
+		int[] scoreCount = new int[6]; 
 		for (int i = 0; i < 5; i++)
 			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
-		int zeroCount = 0; 
-		for (int a = 0; a < 5; a++){
-			if (scoreCount[a] == 0)
-				zeroCount++;
+		boolean valid = false;
+		for (int a = 0; a < 6; a++){
+			if (scoreCount[a] >= 4)
+				valid = true;
 		}
-		if (zeroCount > 1)
+		if (valid)
 			scores[7] = dg.getTotal();
 		else
 			scores[7] = 0; 
 	}
 	
+	/**
+	 *	Updates the scorecard for the Full House choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
 	public void fullHouse(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
-		for (int i = 0; i < 5; i++)
-			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
-		for (int a = 0; a < 4; a++){
-			for (int b = a + 1; b < 5; b++){
-				if ((scoreCount[a] == 3 && scoreCount[b] == 2) || 
-					(scoreCount[a] == 2 && scoreCount[b] == 3))
-					scores[8] = 25;
-				else
-					scores[8] = 0;
-			}
-		}
-		
-	}
-	
-	public void smallStraight(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
-		int rowCounter = 0; 
+		int[] scoreCount = new int[6]; 
 		for (int i = 0; i < 5; i++)
 			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
 		for (int a = 0; a < 5; a++){
+			for (int b = a + 1; b < 6; b++){
+				if ((scoreCount[a] == 3 && scoreCount[b] == 2) || 
+					(scoreCount[a] == 2 && scoreCount[b] == 3))
+					scores[8] = 25;
+			}
+		}
+		if (scores[8] == -1)
+			scores[8] = 0; 
+	}
+	
+	/**
+	 *	Updates the scorecard for the Small Straight choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
+	public void smallStraight(DiceGroup dg) {
+		int[] scoreCount = new int[6]; 
+		int rowCounter = 0; 
+		for (int i = 0; i < 5; i++)
+			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
+		for (int a = 0; a < 6; a++){
 			if (scoreCount[a] > 0)
 				rowCounter++; 
-			else
+			else if (rowCounter < 4)
 				rowCounter = 0; 
 		}
 		if (rowCounter >= 4)
@@ -161,15 +179,20 @@ public class YahtzeeScoreCard {
 			scores[9] = 0; 
 	}	
 	
+	/**
+	 *	Updates the scorecard for the Large Straight choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
 	public void largeStraight(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
+		int[] scoreCount = new int[6]; 
 		int rowCounter = 0; 
 		for (int i = 0; i < 5; i++)
 			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
-		for (int a = 0; a < 5; a++){
+		for (int a = 0; a < 6; a++){
 			if (scoreCount[a] > 0)
 				rowCounter++; 
-			else
+			else if (rowCounter < 5)
 				rowCounter = 0; 
 		}
 		if (rowCounter >= 5)
@@ -178,21 +201,31 @@ public class YahtzeeScoreCard {
 			scores[10] = 0;
 	}
 	
+	/**
+	 *	Updates the scorecard for the Chance choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
 	public void chance(DiceGroup dg) {
 		scores[11] = dg.getTotal(); 
 	}
 	
+	/**
+	 *	Updates the scorecard for the Yahtzee choice.
+	 *
+	 *	@param dg	The DiceGroup to score
+	 */	
 	public void yahtzeeScore(DiceGroup dg) {
-		int[] scoreCount = new int[5]; 
+		int[] scoreCount = new int[6]; 
 		for (int i = 0; i < 5; i++)
 			scoreCount[dg.getDie(i).getLastRollValue() - 1]++;
-		int zeroCount = 0; 
-		for (int a = 0; a < 5; a++){
-			if (scoreCount[a] == 0)
-				zeroCount++;
+		boolean valid = false;
+		for (int a = 0; a < 6; a++){
+			if (scoreCount[a] == 5)
+				valid = true;
 		}
-		if (zeroCount > 0)
-			scores[12] = dg.getTotal();
+		if (valid)
+			scores[12] = 50;
 		else
 			scores[12] = 0; 
 	}

@@ -1,33 +1,42 @@
 import java.util.Scanner;
 /**
- *	Introduce the game here
+ *	Yahtzee is a game where two players roll 5 die and try to get the highest score.
+ *  There are 13 scoring categories, including yahtzee, large/small straights, full
+ *  house, etc. The 5 die have to match a certain criteria to get all of the points
+ *  for a category. Each player is responsible for rolling the dice in order to 
+ *  meet these criteria.
  *
- *	@author	
- *	@since	
+ *	@author	Rishi Salvi
+ *	@since	10/03/23
  */
  
 public class Yahtzee {
-	private YahtzeePlayer player1;
-	private YahtzeePlayer player2; 
-	private int firstPlayer;
+	private YahtzeePlayer player1; // player 1 (contains name and scorecard)
+	private YahtzeePlayer player2; // player 2 (contains name and scorecard)
+	private int firstPlayer; // what player has the first turn
+    private DiceGroup dg; // the 5 dice which are being rolled
 
 	public Yahtzee(){
 		player1 = new YahtzeePlayer();
 		player2 = new YahtzeePlayer();
 		firstPlayer = 0;
+        dg = new DiceGroup();
 	}
 	public static void main(String[] args){
 		Yahtzee ya = new Yahtzee();
 		ya.run();
 	}
 	
+    /**
+     * runs the game - calls all of the methods in order to proceed
+     */
 	public void run(){
 		printHeader();
 		getPlayerNames();
 		firstPlayer = getFirstPlayer();
 		printCard();
 		for (int i = 1; i < 14; i++){
-			System.out.println("\nRound " + i + "of 13 rounds.\n\n");
+			System.out.println("\nRound " + i + " of 13 rounds.\n");
 			if (firstPlayer == 1){
 				playTurn(player1);
 				playTurn(player2);
@@ -37,9 +46,13 @@ public class Yahtzee {
 				playTurn(player1);
 			}
 		}
-		//printFinalResult();
+		printFinal();
 	}
 
+    /**
+     * responsible for printing the header that provides the users with the instructions
+     * for the game
+     */
 	public void printHeader() {
 		System.out.println("\n");
 		System.out.println("+------------------------------------------------------------------------------------+");
@@ -62,6 +75,10 @@ public class Yahtzee {
 		System.out.println("\n\n");
 	}
 
+    /**
+     * prompts for the users' names and stores them in their respective Objects
+     * for later use
+     */
 	public void getPlayerNames(){
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Player 1, please enter your first name : ");
@@ -70,8 +87,15 @@ public class Yahtzee {
 		player2.setName(scan.nextLine());
 	}
 
+    /**
+     * decides which player is going first
+     * rolls the dice once for each player and the higher score is the one that 
+     * goes first
+     * in case of a tie, the dice are rerolled until one score is higher than the other
+     * @return      which player's turn is first
+     */
 	public int getFirstPlayer(){
-		DiceGroup dg = new DiceGroup();
+		dg = new DiceGroup();
 		Scanner scan = new Scanner(System.in);
 		boolean firstFound = false; 
 		String p1 = player1.getName();
@@ -82,17 +106,17 @@ public class Yahtzee {
 		while (!firstFound){
 			System.out.print("\nLet's see who will go first. " + p1 + 
 				", please hit enter to roll the dice : ");
-			scan.nextLine();
+			scan.nextLine(); // allows code to continue after user input
 			dg.rollDice();
 			dg.printDice();
 			score1 = dg.getTotal();
-			System.out.print("\nLet's see who will go first. " + p2 + 
-				", please hit enter to roll the dice : ");
+			System.out.print("\n" + p2 + ", it's your turn. " +
+				"Please hit enter to roll the dice : ");
 			scan.nextLine();
 			dg.rollDice();
 			dg.printDice();
 			score2 = dg.getTotal();
-			if (score1 == score2)
+			if (score1 == score2) // equal scores
 				System.out.println("Whoops, we have a tie (both rolled " + score1 + 
 				"). Looks like we'll have to try that again . . .");
 			else
@@ -113,6 +137,10 @@ public class Yahtzee {
 		return firstPlayer;
 	}
 
+    /**
+     * responsible for printing out the scorecard each time a player's score is 
+     * updated
+     */
 	public void printCard(){
 		YahtzeeScoreCard ysc1 = player1.getScoreCard();
 		YahtzeeScoreCard ysc2 = player2.getScoreCard();
@@ -121,49 +149,105 @@ public class Yahtzee {
 		ysc2.printPlayerScore(player2);
 	}
 
-	public void playTurn(YahtzeePlayer yahtzeePlayer){
-		final Scanner scanner = new Scanner(System.in);
-        final DiceGroup diceGroup = new DiceGroup();
-        System.out.printf("\n%s, it's your turn to play. Please hit enter to roll the dice : ", yahtzeePlayer.getName());
-        scanner.nextLine();
-        diceGroup.rollDice();
-        diceGroup.printDice();
-        System.out.println("\nWhich di(c)e would you like to keep?  Enter the values you'd like to 'hold' without");
-        System.out.println("spaces.  For examples, if you'd like to 'hold' die 1, 2, and 5, enter 125");
+    /**
+     * controls each turn for each player
+     * two parts - rolling the die and selecting the score category
+     * @param player    what player's turn it is
+     */
+	public void playTurn(YahtzeePlayer player){
+		finishRolling(player);
+        selectCategory(player);
+	}
+
+    /**
+     * rolls the dice for the player
+     * has an option to reroll certain dice if they want up to 2 times
+     * @param player    what player's turn it is
+     */
+    public void finishRolling(YahtzeePlayer player){
+        dg = new DiceGroup();
+        Scanner scan = new Scanner(System.in);
+        String name = player.getName();
+
+        System.out.printf("\n" + name + ", it's your turn to play. Please hit " +
+            "enter to roll the dice : ");
+        scan.nextLine(); // allows code to continue after user input
+        dg.rollDice();
+        dg.printDice();
+        System.out.println("\nWhich di(c)e would you like to keep?  Enter the" +
+            " values you'd like to 'hold' without spaces");
+        System.out.println("For examples, if you'd like to 'hold' die 1, 2," +
+            " and 5, enter 125");
         System.out.print("(enter -1 if you'd like to end the turn) : ");
-        final String nextLine = scanner.nextLine();
-        if (!nextLine.equals("-1")) {
-            diceGroup.rollDice(nextLine);
-            diceGroup.printDice();
-            System.out.println("\nWhich di(c)e would you like to keep?  Enter the values you'd like to 'hold' without");
-            System.out.println("spaces.  For examples, if you'd like to 'hold' die 1, 2, and 5, enter 125");
+        String current = scan.nextLine();
+
+        if (!current.equals("-1")) { // reroll
+            dg.rollDice(current);
+            dg.printDice();
+            System.out.println("\nWhich di(c)e would you like to keep?  Enter the" +
+                " values you'd like to 'hold' without spaces");
+            System.out.println("For examples, if you'd like to 'hold' die 1, 2," +
+                " and 5, enter 125");
             System.out.print("(enter -1 if you'd like to end the turn) : ");
-            final String nextLine2 = scanner.nextLine();
-            if (!nextLine2.equals("-1")) {
-                diceGroup.rollDice(nextLine2);
-                diceGroup.printDice();
+            current = scan.nextLine();
+            if (!current.equals("-1")) { // reroll
+                dg.rollDice(current);
+                dg.printDice();
             }
         }
-        this.printCard();
+    }
+
+    /**
+     * user is able to select which category they want to be scored on depending on
+     * the roll of their dice
+     * checks if the category they selected is valid (ex. hasn't been selected before)
+     * and if it is, sets its value to the result of the roll
+     * @param player    what player's turn it is
+     */
+    public void selectCategory(YahtzeePlayer player){
+        printCard();
+        String name = player.getName();
         System.out.println("\t\t  1    2    3    4    5    6    7    8    9   10   11   12   13\n");
-        System.out.printf("%s, now you need to make a choice. Pick a valid integer from the list above : ", yahtzeePlayer.getName());
-        boolean b = false;
-        int nextInt;
-        do {
-            nextInt = scanner.nextInt();
-            if (nextInt > 0 && nextInt < 14) {
-                if (yahtzeePlayer.getScoreCard().getScore(nextInt) > -1) {
+        System.out.print(name +", now you need to make a choice. Pick a valid " +
+            "integer from the list above : ");
+
+        Scanner scan = new Scanner(System.in);
+        boolean isValid = false;
+        YahtzeeScoreCard sc = player.getScoreCard();
+
+        while (!isValid){
+            int category = scan.nextInt();
+            if (category > 0 && category < 14) {
+                if (sc.changeScore(category, dg)) 
+                   isValid = true;
+                else
                     System.out.print("Pick a valid integer from the list above : ");
-                }
-                else {
-                    b = true;
-                }
             }
             else {
                 System.out.print("Pick a valid integer from the list above : ");
             }
-        } while (!b);
-        yahtzeePlayer.getScoreCard().changeScore(nextInt, diceGroup);
-        this.printCard();
-	}
+        }
+
+        printCard();
+    }
+
+    /**
+     * prints the final scores for both of the players after all of the rounds
+     */
+    public void printFinal(){
+        int score1 = 0;
+        String name1 = player1.getName();
+        int score2 = 0;
+        String name2 = player2.getName();
+
+        for (int i = 1; i < 14; i++){
+            score1 += player1.getScoreCard().getScore(i);
+            score2 += player2.getScoreCard().getScore(i);
+            
+        }
+
+        System.out.println(name1 + " had a score of " + score1);
+        System.out.println(name2 + " had a score of " + score2);
+        System.out.println();
+    }
 }

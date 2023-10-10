@@ -6,8 +6,8 @@
 */
 
 public class DiceGroup {
-	private Dice [] die;
-	private int[] rolls; 
+	private Dice [] die; // array containing the 5 dice that are rolled
+	private int[] rolls; // array containing the roll of each die
 	
 	// Create the seven different line images of a die
 	String [] line = {	" _______ ",
@@ -24,6 +24,8 @@ public class DiceGroup {
 	public DiceGroup() {
 		// you complete
 		die = new Dice[5];
+		for (int i = 0; i < 5; i++)
+			die[i] = new Dice();
 		rolls = new int[5]; 
 	}
 		
@@ -32,7 +34,7 @@ public class DiceGroup {
 	 */
 	public void rollDice() {
 		// you complete
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 5; i++)
 			rolls[i] = die[i].roll(); 
 	}
 	
@@ -43,10 +45,17 @@ public class DiceGroup {
 	 */
 	public void rollDice(String rawHold) {
 		// you complete
-		for (int j = 0; j < rawHold.length(); j++){
-			int diceNum = Integer.parseInt(rawHold.charAt(j) + ""); 
-			rolls[diceNum] = die[j].roll(); 
+		for (int i = 0; i < 5; i++){
+			for (int j = 0; j < rawHold.length(); j++){
+				int diceNum = Integer.parseInt(rawHold.charAt(j) + "") - 1; 
+				if (i == diceNum)
+					j = rawHold.length();
+				if (j == rawHold.length() - 1)
+					rolls[i] = die[i].roll(); 
+			}
 		}
+		if (rawHold.equals("")) //edge-case (doesn't want to hold anything)
+			rollDice();
 	}
 	
 	/**
