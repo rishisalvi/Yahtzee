@@ -44,8 +44,8 @@ public class DiceGroup {
 	public void rollDice(String rawHold) {
 		// you complete
 		for (int j = 0; j < rawHold.length(); j++){
-			int diceNum = Integer.parseInt(rawHold.charAt(j)); 
-			rolls[diceNum] = die[i].roll(); 
+			int diceNum = Integer.parseInt(rawHold.charAt(j) + ""); 
+			rolls[diceNum] = die[j].roll(); 
 		}
 	}
 	

@@ -26,6 +26,18 @@ public class Yahtzee {
 		getPlayerNames();
 		firstPlayer = getFirstPlayer();
 		printCard();
+		for (int i = 1; i < 14; i++){
+			System.out.println("\nRound " + i + "of 13 rounds.\n\n");
+			if (firstPlayer == 1){
+				playTurn(player1);
+				playTurn(player2);
+			}
+			else{
+				playTurn(player2);
+				playTurn(player1);
+			}
+		}
+		//printFinalResult();
 	}
 
 	public void printHeader() {
@@ -54,7 +66,7 @@ public class Yahtzee {
 		Scanner scan = new Scanner(System.in);
 		System.out.print("Player 1, please enter your first name : ");
 		player1.setName(scan.nextLine());
-		System.out.print("Player 2, please enter your first name : ");
+		System.out.print("\nPlayer 2, please enter your first name : ");
 		player2.setName(scan.nextLine());
 	}
 
@@ -70,11 +82,13 @@ public class Yahtzee {
 		while (!firstFound){
 			System.out.print("\nLet's see who will go first. " + p1 + 
 				", please hit enter to roll the dice : ");
+			scan.nextLine();
 			dg.rollDice();
 			dg.printDice();
 			score1 = dg.getTotal();
 			System.out.print("\nLet's see who will go first. " + p2 + 
 				", please hit enter to roll the dice : ");
+			scan.nextLine();
 			dg.rollDice();
 			dg.printDice();
 			score2 = dg.getTotal();
@@ -87,7 +101,7 @@ public class Yahtzee {
 		System.out.println();
 		System.out.println(p1 + ", you rolled a sum of " + score1 + ", and " + p2 +
 			", you rolled a sum of " + score2);
-		if (total1 > total2){
+		if (score1 > score2){
 			firstPlayer = 1;
 			System.out.print(player1.getName());
 		}
@@ -105,5 +119,51 @@ public class Yahtzee {
 		ysc1.printCardHeader();
 		ysc1.printPlayerScore(player1);
 		ysc2.printPlayerScore(player2);
+	}
+
+	public void playTurn(YahtzeePlayer yahtzeePlayer){
+		final Scanner scanner = new Scanner(System.in);
+        final DiceGroup diceGroup = new DiceGroup();
+        System.out.printf("\n%s, it's your turn to play. Please hit enter to roll the dice : ", yahtzeePlayer.getName());
+        scanner.nextLine();
+        diceGroup.rollDice();
+        diceGroup.printDice();
+        System.out.println("\nWhich di(c)e would you like to keep?  Enter the values you'd like to 'hold' without");
+        System.out.println("spaces.  For examples, if you'd like to 'hold' die 1, 2, and 5, enter 125");
+        System.out.print("(enter -1 if you'd like to end the turn) : ");
+        final String nextLine = scanner.nextLine();
+        if (!nextLine.equals("-1")) {
+            diceGroup.rollDice(nextLine);
+            diceGroup.printDice();
+            System.out.println("\nWhich di(c)e would you like to keep?  Enter the values you'd like to 'hold' without");
+            System.out.println("spaces.  For examples, if you'd like to 'hold' die 1, 2, and 5, enter 125");
+            System.out.print("(enter -1 if you'd like to end the turn) : ");
+            final String nextLine2 = scanner.nextLine();
+            if (!nextLine2.equals("-1")) {
+                diceGroup.rollDice(nextLine2);
+                diceGroup.printDice();
+            }
+        }
+        this.printCard();
+        System.out.println("\t\t  1    2    3    4    5    6    7    8    9   10   11   12   13\n");
+        System.out.printf("%s, now you need to make a choice. Pick a valid integer from the list above : ", yahtzeePlayer.getName());
+        boolean b = false;
+        int nextInt;
+        do {
+            nextInt = scanner.nextInt();
+            if (nextInt > 0 && nextInt < 14) {
+                if (yahtzeePlayer.getScoreCard().getScore(nextInt) > -1) {
+                    System.out.print("Pick a valid integer from the list above : ");
+                }
+                else {
+                    b = true;
+                }
+            }
+            else {
+                System.out.print("Pick a valid integer from the list above : ");
+            }
+        } while (!b);
+        yahtzeePlayer.getScoreCard().changeScore(nextInt, diceGroup);
+        this.printCard();
 	}
 }
